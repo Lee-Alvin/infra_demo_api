@@ -10,6 +10,8 @@ on:
 
 env:
  TF_LOG: INFO
+ AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+ AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
  BUCKET_TF_STATE: terraform-state-file-cointracker-hello-world
 
 jobs:
@@ -25,8 +27,8 @@ jobs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-access-key-id: $AWS_ACCESS_KEY_ID
+        aws-secret-access-key: $AWS_SECRET_ACCESS_KEY
         aws-region: us-east-1
 
     - name: Login to Amazon ECR
@@ -43,6 +45,7 @@ jobs:
         docker push $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$ECR_REPOSITORY:latest
 
   terraform:
+   needs: build
    name: "Terraform Infrastructure Change Management"
    runs-on: ubuntu-latest
    defaults:
