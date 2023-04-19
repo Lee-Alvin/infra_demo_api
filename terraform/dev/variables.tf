@@ -12,7 +12,7 @@ variable "fargate_cpu" {
 }
 
 variable "fargate_memory" {
-  default = 512
+  default = 1024
 }
 
 variable "docker_repo" {
