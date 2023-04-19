@@ -15,8 +15,20 @@ variable "fargate_memory" {
   default = 1024
 }
 
+variable "service_name" {
+  default = "cointracker_hello_world_ecr"
+}
+
+variable "region" {
+  default = "us-east-1"
+}
+
+variable "account_id" {
+  default = "523878000693"
+}
+
 variable "docker_repo" {
-  default = "523878000693.dkr.ecr.us-east-1.amazonaws.com/cointracker_hello_world_ecr:latest"
+  default = "${account_id}.dkr.ecr.${service_name}.amazonaws.com/${service_name}:latest"
 }
 
 variable "tags" {
