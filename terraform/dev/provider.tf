@@ -2,9 +2,11 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "4.53.0"
+      version = "3.11"
     }
   }
+
+  required_version = ">= 0.14"
 
   backend "s3" {
     bucket         = "terraform-state-file-cointracker-hello-world"
