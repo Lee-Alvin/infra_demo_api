@@ -4,10 +4,25 @@ This is a simple Flask API that returns "Hello World!" to all incoming requests.
 
 Github Actions is used as a CI/CD tool to automatically build and push the Docker image to ECR as shown in the deploy.yml. Also in the deploy.yml file is instructions to run Terraform plan and apply upon merges or pushes to main branch.
 
+To run locally, use docker-compose to build and start a nginx and gunicorn web server to host the Flask API.
+
 ## Requirements/Libraries:
 
 - Python 3.10+
 - Poetry
+- Docker
 - AWS CLI installed and AWS account configured to user with permissions to create and destroy resources.
 - Terraform
 - Flask
+- Postman
+
+## Running and Testing Locally:
+
+To run and the application locally, you will need Docker installed. Navigate to the root and run below to build the image and run:
+
+```
+    docker-compose build
+    docker-compose up
+```
+
+Then, open Postman and you can send test requests to http://127.0.0.1:80 . Behind the scenes, a container for a nginx web server and a container for a Gunicorn web server hosting the Flask API are started up.

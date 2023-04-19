@@ -1,6 +1,4 @@
 env
-nginx
-docker-compose.yml
 .vscode
 **/__pycache__
 **/.terraform
