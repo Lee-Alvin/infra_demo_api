@@ -28,7 +28,7 @@ variable "account_id" {
 }
 
 variable "docker_repo" {
-  default = "${account_id}.dkr.ecr.${service_name}.amazonaws.com/${service_name}:latest"
+  default = "523878000693.dkr.ecr.us-east-1.amazonaws.com/cointracker_hello_world_ecr:latest"
 }
 
 variable "tags" {
