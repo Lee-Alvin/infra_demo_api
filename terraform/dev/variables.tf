@@ -12,7 +12,7 @@ variable "fargate_cpu" {
 }
 
 variable "fargate_memory" {
-  default = 1024
+  default = 512
 }
 
 variable "service_name" {

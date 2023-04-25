@@ -6,10 +6,10 @@ RUN pip install --upgrade pip
 
 # Set working directory. Install poetry, install deps, copy code, run GUNICORN
 WORKDIR /app
-COPY poetry.lock pyproject.toml ./
 RUN pip install "poetry==$POETRY_VERSION" 
-
 RUN poetry config virtualenvs.create false
+
+COPY poetry.lock pyproject.toml ./
 RUN poetry install --no-interaction --no-ansi
 
 COPY . .

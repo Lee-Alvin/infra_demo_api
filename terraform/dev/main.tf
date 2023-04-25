@@ -72,6 +72,12 @@ resource "aws_ecs_task_definition" "cointracker_hello_world_task_definition" {
 #routing, availability zones, public subnets
 data "aws_availability_zones" "azs" {}
 
+resource "aws_vpc" "vpc" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+}
+
 resource "aws_internet_gateway" "internet_gateway" {
   vpc_id = aws_vpc.vpc.id
   tags = {
@@ -139,7 +145,6 @@ resource "aws_security_group" "ecs_sg" {
     from_port       = 8080
     to_port         = 8080
     protocol        = "tcp"
-    cidr_blocks     = ["0.0.0.0/0"]
     security_groups = [aws_security_group.alb_sg.id]
   }
 
@@ -191,7 +196,7 @@ resource "aws_ecs_cluster" "cointracker_hello_world" {
 resource "aws_ecs_service" "cointracker_hello_world_service" {
   name            = "cointracker_hello_world_service"
   task_definition = aws_ecs_task_definition.cointracker_hello_world_task_definition.arn
-  desired_count   = 1
+  desired_count   = 2
   cluster         = aws_ecs_cluster.cointracker_hello_world.id
   launch_type     = "FARGATE"
 
