@@ -16,7 +16,7 @@ variable "fargate_memory" {
 }
 
 variable "service_name" {
-  default = "cointracker_hello_world_ecr"
+  default = "infra_demo_api_ecr"
 }
 
 variable "region" {
@@ -28,13 +28,13 @@ variable "account_id" {
 }
 
 variable "docker_repo" {
-  default = "523878000693.dkr.ecr.us-east-1.amazonaws.com/cointracker_hello_world_ecr:latest"
+  default = "523878000693.dkr.ecr.us-east-1.amazonaws.com/infra_demo_api_ecr:latest"
 }
 
 variable "tags" {
   type = map(string)
   default = {
     environment  = "development"
-    service_name = "cointracker_hello_world"
+    service_name = "infra_demo_api"
   }
 }

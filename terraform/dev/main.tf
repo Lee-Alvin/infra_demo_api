@@ -1,6 +1,6 @@
 #Hosting the state file remotely to disallow multiple devs making changes to the same resources at once
 resource "aws_s3_bucket" "terraform_state_file" {
-  bucket        = "terraform-state-file-cointracker-hello-world"
+  bucket        = "terraform-state-file-infra-demo-api"
   force_destroy = true
   tags          = var.tags
 }
@@ -22,7 +22,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state_e
 }
 
 resource "aws_dynamodb_table" "terraform_state_lock" {
-  name         = "terraform_state_lock_cointracker_hello_world"
+  name         = "terraform_state_lock_infra_demo_api"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
 
@@ -33,8 +33,8 @@ resource "aws_dynamodb_table" "terraform_state_lock" {
 }
 
 #Create the ECR where we will push the Dockerfiles
-resource "aws_ecr_repository" "cointracker_hello_world_ecr" {
-  name                 = "cointracker_hello_world_ecr"
+resource "aws_ecr_repository" "infra_demo_api_ecr" {
+  name                 = "infra_demo_api_ecr"
   image_tag_mutability = "MUTABLE"
 
   tags = var.tags
@@ -45,8 +45,8 @@ data "aws_iam_role" "ecs_task_execution_role" {
   name = "ecsTaskExecutionRole"
 }
 
-resource "aws_ecs_task_definition" "cointracker_hello_world_task_definition" {
-  family                   = "cointracker_hello_world_task_definition"
+resource "aws_ecs_task_definition" "infra_demo_api_task_definition" {
+  family                   = "infra_demo_api_task_definition"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = var.fargate_cpu
@@ -54,7 +54,7 @@ resource "aws_ecs_task_definition" "cointracker_hello_world_task_definition" {
   execution_role_arn       = data.aws_iam_role.ecs_task_execution_role.arn
   container_definitions = jsonencode([
     {
-      "name" : "cointracker_hello_world_container",
+      "name" : "infra_demo_api_container",
       "image" : "${var.docker_repo}",
       "essential" : true,
       "memoryReservation" : 512,
@@ -81,7 +81,7 @@ resource "aws_vpc" "vpc" {
 resource "aws_internet_gateway" "internet_gateway" {
   vpc_id = aws_vpc.vpc.id
   tags = {
-    Name = "cointracker_hello_world_igw"
+    Name = "infra_demo_api_igw"
   }
 }
 
@@ -94,7 +94,7 @@ resource "aws_route_table" "rt_public" {
   }
 
   tags = {
-    Name = "cointracker_hello_world_rt_public"
+    Name = "infra_demo_api_rt_public"
   }
 }
 
@@ -105,7 +105,7 @@ resource "aws_subnet" "public_subnets" {
   vpc_id            = aws_vpc.vpc.id
 
   tags = {
-    Name = "cointracker_hello_world_public_${count.index + 1}"
+    Name = "infra_demo_api_public_${count.index + 1}"
   }
 }
 
@@ -117,7 +117,7 @@ resource "aws_route_table_association" "public_rt_association" {
 
 #security groups controlling access to the ALB and to the ECS cluster
 resource "aws_security_group" "alb_sg" {
-  name   = "cointracker_hello_world_alb_sg"
+  name   = "infra_demo_api_alb_sg"
   vpc_id = aws_vpc.vpc.id
 
   ingress {
@@ -157,16 +157,16 @@ resource "aws_security_group" "ecs_sg" {
 }
 
 #Application load balancer that will be directing external traffic to containers in ECS cluster
-resource "aws_alb" "cointracker_hello_world_alb" {
+resource "aws_alb" "infra_demo_api_alb" {
   load_balancer_type = "application"
-  name               = "cointracker-hello-world-alb"
+  name               = "infra-demo-api-alb"
   subnets            = aws_subnet.public_subnets.*.id
   security_groups    = [aws_security_group.alb_sg.id]
 }
 
 # point redirected traffic to the app
 resource "aws_alb_target_group" "target_group" {
-  name        = "cointracker-hello-world-tg"
+  name        = "infra-demo-api-tg"
   port        = 80
   protocol    = "HTTP"
   vpc_id      = aws_vpc.vpc.id
@@ -174,8 +174,8 @@ resource "aws_alb_target_group" "target_group" {
 }
 
 # direct traffic through the ALB
-resource "aws_alb_listener" "cointracker_alb_listener" {
-  load_balancer_arn = aws_alb.cointracker_hello_world_alb.arn
+resource "aws_alb_listener" "infra_alb_listener" {
+  load_balancer_arn = aws_alb.infra_demo_api_alb.arn
   port              = 80
   protocol          = "HTTP"
   default_action {
@@ -184,20 +184,20 @@ resource "aws_alb_listener" "cointracker_alb_listener" {
   }
 }
 
-#Putting it all together with ECS cluster and the actual cointracker_hello_world service
-resource "aws_ecs_cluster" "cointracker_hello_world" {
-  name = "cointracker_hello_world"
+#Putting it all together with ECS cluster and the actual infra_demo_api service
+resource "aws_ecs_cluster" "infra_demo_api" {
+  name = "infra_demo_api"
 
   tags = {
-    Name = "cointracker_hello_world"
+    Name = "infra_demo_api"
   }
 }
 
-resource "aws_ecs_service" "cointracker_hello_world_service" {
-  name            = "cointracker_hello_world_service"
-  task_definition = aws_ecs_task_definition.cointracker_hello_world_task_definition.arn
+resource "aws_ecs_service" "infra_demo_api_service" {
+  name            = "infra_demo_api_service"
+  task_definition = aws_ecs_task_definition.infra_demo_api_task_definition.arn
   desired_count   = 2
-  cluster         = aws_ecs_cluster.cointracker_hello_world.id
+  cluster         = aws_ecs_cluster.infra_demo_api.id
   launch_type     = "FARGATE"
 
   network_configuration {
@@ -207,12 +207,12 @@ resource "aws_ecs_service" "cointracker_hello_world_service" {
   }
 
   load_balancer {
-    container_name   = "cointracker_hello_world_container"
+    container_name   = "infra_demo_api_container"
     container_port   = "8080"
     target_group_arn = aws_alb_target_group.target_group.id
   }
 
   depends_on = [
-    aws_alb_listener.cointracker_alb_listener
+    aws_alb_listener.infra_demo_api_alb_listener
   ]
 }

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "cointracker-hello-world"
+name = "infra_demo_api"
 version = "0.1.0"
 description = ""
 authors = ["Alvin Lee <alvinlee4197@gmail.com>"]

@@ -7,10 +7,10 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "terraform-state-file-cointracker-hello-world"
-    key            = "cointracker-hello-world/terraform.tfstate"
+    bucket         = "terraform-state-file-infra-demo-api"
+    key            = "infra-demo-api/terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "terraform_state_lock_cointracker_hello_world"
+    dynamodb_table = "terraform_state_lock_infra_demo_api"
     encrypt        = true
   }
 }
